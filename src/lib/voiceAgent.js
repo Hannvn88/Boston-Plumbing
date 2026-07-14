@@ -4,7 +4,7 @@
 // so the 3D orb can react to the caller's voice in real time.
 
 // n8n endpoint that receives the recorded audio and returns the AI answer
-const WEBHOOK_URL = 'http://n8n.wayfore.studio:5678/webhook/plumbing-voice';
+const WEBHOOK_URL = 'http://n8n.wayfore.studio/webhook/plumbing-voice';
 
 // Shared AudioContext for mic analysis (created lazily after a user gesture)
 let audioCtx = null;
