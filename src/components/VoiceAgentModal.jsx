@@ -102,6 +102,15 @@ const audioPlayerRef = useRef(null); // Stores currently playing audio element s
     audioPlayerRef.current.pause();
     audioPlayerRef.current = null;
   }
+   // Lets the user stop the assistant mid-response, without closing the whole modal
+const stopSpeaking = () => {
+  window.speechSynthesis?.cancel();
+  if (audioPlayerRef.current) {
+    audioPlayerRef.current.pause();
+    audioPlayerRef.current = null;
+  }
+  setAssistantState('idle');
+};
   
   setAssistantState('idle');
   onClose()...
@@ -113,7 +122,7 @@ const audioPlayerRef = useRef(null); // Stores currently playing audio element s
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 grid place-items-center bg-gray-800/40 p-4"
+          className="fixed inset-0 z-50 overflow-y-auto bg-gray-800/40 p-4 flex items-start justify-center sm:items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -125,7 +134,7 @@ const audioPlayerRef = useRef(null); // Stores currently playing audio element s
             role="dialog"
             aria-modal="true"
             aria-label="Boston Plumbing AI assistant"
-            className="relative w-full max-w-lg rounded-md border border-slate-200 bg-white p-8 shadow-lg"
+            className="relative w-full max-w-lg rounded-md border border-slate-200 bg-white p-8 shadow-lg my-8 max-h-[85vh] overflow-y-auto"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -225,12 +234,22 @@ const audioPlayerRef = useRef(null); // Stores currently playing audio element s
                   isBusy && 'cursor-not-allowed opacity-60'
                 )}
               >
+              
                 {isListening ? (
                   <Square className="h-6 w-6" aria-hidden="true" />
                 ) : (
                   <Mic className="h-7 w-7" aria-hidden="true" />
                 )}
               </motion.button>
+              {/* Lets the user interrupt playback instead of waiting it out */}
+              {assistantState === 'speaking' && (
+               <button
+               onClick={stopSpeaking}
+               className="mt-3 text-sm font-medium text-slate-500 underline hover:text-gray-800"
+                 >
+               Stop speaking
+              </button>
+            )}
             </div>
           </motion.div>
         </motion.div>
