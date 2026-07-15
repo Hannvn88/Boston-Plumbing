@@ -43,7 +43,8 @@ export default function VoiceAgentModal({ open, onClose }) {
   const [errorMessage, setErrorMessage] = useState('');
   const recorderRef = useRef(null); // active recorder handle
   const analyserRef = useRef(null); // live mic analyser, read by the orb
-const audioPlayerRef = useRef(null); // Stores currently playing audio element so we can stop it
+  const audioPlayerRef = useRef(null); // currently playing response audio, if any
+
   // Starts microphone capture and hands the analyser to the orb
   const beginListening = async () => {
     try {
@@ -87,29 +88,29 @@ const audioPlayerRef = useRef(null); // Stores currently playing audio element s
     else if (assistantState === 'idle') beginListening();
   };
 
- // Closes the modal and aborts any recording or speech in progress
-const handleClose = () => {
-  recorderRef.current?.stop();
-  recorderRef.current = null;
-  analyserRef.current = null;
-  window.speechSynthesis?.cancel();
-  if (audioPlayerRef.current) {
-    audioPlayerRef.current.pause();
-    audioPlayerRef.current = null;
-  }
-  setAssistantState('idle');
-  onClose();
-};
+  // Closes the modal and aborts any recording, speech, or audio playback in progress
+  const handleClose = () => {
+    recorderRef.current?.stop();
+    recorderRef.current = null;
+    analyserRef.current = null;
+    window.speechSynthesis?.cancel();
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current = null;
+    }
+    setAssistantState('idle');
+    onClose();
+  };
 
-// Lets the user stop the assistant mid-response, without closing the whole modal
-const stopSpeaking = () => {
-  window.speechSynthesis?.cancel();
-  if (audioPlayerRef.current) {
-    audioPlayerRef.current.pause();
-    audioPlayerRef.current = null;
-  }
-  setAssistantState('idle');
-};
+  // Lets the user stop the assistant mid-response, without closing the whole modal
+  const stopSpeaking = () => {
+    window.speechSynthesis?.cancel();
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current = null;
+    }
+    setAssistantState('idle');
+  };
 
   const isBusy = assistantState === 'thinking' || assistantState === 'speaking';
   const isListening = assistantState === 'listening';
@@ -202,7 +203,7 @@ const stopSpeaking = () => {
             {/* Circular icon-only talk button, matching the orb's aesthetic.
                 The status line above carries the instructions; the button stays
                 labelled for screen readers via aria-label. */}
-            <div className="mt-7 flex justify-center">
+            <div className="mt-7 flex flex-col items-center">
               <motion.button
                 onClick={handleTalkClick}
                 disabled={isBusy}
@@ -230,22 +231,22 @@ const stopSpeaking = () => {
                   isBusy && 'cursor-not-allowed opacity-60'
                 )}
               >
-              
                 {isListening ? (
                   <Square className="h-6 w-6" aria-hidden="true" />
                 ) : (
                   <Mic className="h-7 w-7" aria-hidden="true" />
                 )}
               </motion.button>
+
               {/* Lets the user interrupt playback instead of waiting it out */}
               {assistantState === 'speaking' && (
-               <button
-               onClick={stopSpeaking}
-               className="mt-3 text-sm font-medium text-slate-500 underline hover:text-gray-800"
-                 >
-               Stop speaking
-              </button>
-            )}
+                <button
+                  onClick={stopSpeaking}
+                  className="mt-3 text-sm font-medium text-slate-500 underline hover:text-gray-800"
+                >
+                  Stop speaking
+                </button>
+              )}
             </div>
           </motion.div>
         </motion.div>
