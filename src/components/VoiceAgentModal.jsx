@@ -72,7 +72,7 @@ export default function VoiceAgentModal({ open, onClose }) {
 
       // Speak the reply: webhook audio if provided, otherwise browser speech synthesis
       setAssistantState('speaking');
-      if (data.audio) await playAudioResponse(data.audio, data.audioMimeType);
+      if (data.audio) await playAudioResponse(data.audio, 'audio/wav');
       else await speakText(data.answer);
       setAssistantState('idle'); // ready for the next question
     } catch {
