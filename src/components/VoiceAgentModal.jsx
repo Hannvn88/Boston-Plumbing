@@ -43,7 +43,7 @@ export default function VoiceAgentModal({ open, onClose }) {
   const [errorMessage, setErrorMessage] = useState('');
   const recorderRef = useRef(null); // active recorder handle
   const analyserRef = useRef(null); // live mic analyser, read by the orb
-
+const audioPlayerRef = useRef(null); // Stores currently playing audio element so we can stop it
   // Starts microphone capture and hands the analyser to the orb
   const beginListening = async () => {
     try {
@@ -72,7 +72,7 @@ export default function VoiceAgentModal({ open, onClose }) {
 
       // Speak the reply: webhook audio if provided, otherwise browser speech synthesis
       setAssistantState('speaking');
-      if (data.audio) await playAudioResponse(data.audio, 'audio/wav');
+      if (data.audio) await playAudioResponse(data.audio, 'audio/wav', audioPlayerRef);
       else await speakText(data.answer);
       setAssistantState('idle'); // ready for the next question
     } catch {
@@ -88,14 +88,23 @@ export default function VoiceAgentModal({ open, onClose }) {
   };
 
   // Closes the modal and aborts any recording or speech in progress
-  const handleClose = () => {
-    recorderRef.current?.stop();
-    recorderRef.current = null;
-    analyserRef.current = null;
-    window.speechSynthesis?.cancel();
-    setAssistantState('idle');
-    onClose();
-  };
+ const handleClose = () => {
+  // Stop mic recording if active
+  recorderRef.current?.stop();
+  recorderRef.current = null;
+  analyserRef.current = null;
+  
+  // Cancel any browser speech synthesis
+  window.speechSynthesis?.cancel();
+  
+  // Stop any playing audio from n8n response
+  if (audioPlayerRef.current) {
+    audioPlayerRef.current.pause();
+    audioPlayerRef.current = null;
+  }
+  
+  setAssistantState('idle');
+  onClose()...
 
   const isBusy = assistantState === 'thinking' || assistantState === 'speaking';
   const isListening = assistantState === 'listening';
