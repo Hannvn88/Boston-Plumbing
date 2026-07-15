@@ -87,22 +87,21 @@ const audioPlayerRef = useRef(null); // Stores currently playing audio element s
     else if (assistantState === 'idle') beginListening();
   };
 
-  // Closes the modal and aborts any recording or speech in progress
- const handleClose = () => {
-  // Stop mic recording if active
+ // Closes the modal and aborts any recording or speech in progress
+const handleClose = () => {
   recorderRef.current?.stop();
   recorderRef.current = null;
   analyserRef.current = null;
-  
-  // Cancel any browser speech synthesis
   window.speechSynthesis?.cancel();
-  
-  // Stop any playing audio from n8n response
   if (audioPlayerRef.current) {
     audioPlayerRef.current.pause();
     audioPlayerRef.current = null;
   }
-   // Lets the user stop the assistant mid-response, without closing the whole modal
+  setAssistantState('idle');
+  onClose();
+};
+
+// Lets the user stop the assistant mid-response, without closing the whole modal
 const stopSpeaking = () => {
   window.speechSynthesis?.cancel();
   if (audioPlayerRef.current) {
@@ -111,9 +110,6 @@ const stopSpeaking = () => {
   }
   setAssistantState('idle');
 };
-  
-  setAssistantState('idle');
-  onClose()...
 
   const isBusy = assistantState === 'thinking' || assistantState === 'speaking';
   const isListening = assistantState === 'listening';
