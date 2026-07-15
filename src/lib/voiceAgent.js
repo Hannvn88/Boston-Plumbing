@@ -76,7 +76,7 @@ export async function sendToWebhook(audioBlob) {
 
 // Plays a base64-encoded audio response through an <audio> element.
 // Resolves when playback finishes (or fails, so the UI never hangs).
-export function playAudioResponse(base64Audio, mimeType = 'audio/mpeg') {
+export function playAudioResponse(base64Audio, mimeType = 'audio/wav') {
   return new Promise((resolve) => {
     const player = new Audio(`data:${mimeType};base64,${base64Audio}`);
     player.onended = resolve;
