@@ -3,11 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1920, height=1080" />
-    <title>Boston Plumbing — AI Voice Agent (brag)</title>
+    <title>Boston Plumbing — the Living Voice Orb (brag)</title>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
-    <!-- Fonts resolved deterministically from HyperFrames' bundled set (no network):
-         Outfit (display) closely matches the site's General Sans; Inter (body) is the site's body face. -->
+    <!-- Fonts resolved deterministically (no network at render):
+         Outfit (display) closely matches the site's General Sans; Inter (body) is the site's body face;
+         Caveat (self-embedded, OFL) is the handwritten "AI-Powered" accent from the site's design system. -->
     <style>
+      @font-face {
+        font-family: "Caveat";
+        font-style: normal;
+        font-weight: 600;
+        font-display: block;
+        src: url("assets/fonts/caveat-600.woff2") format("woff2");
+      }
       :root {
         --forest: #14432a;
         --forest-deep: #0f3d2e;
@@ -18,6 +26,7 @@
         --slate50: #f8fafc;
         --font-display: "Outfit", "Inter", system-ui, sans-serif;
         --font-body: "Inter", system-ui, sans-serif;
+        --font-hand: "Caveat", cursive;
       }
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body {
@@ -30,57 +39,78 @@
       #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
       .clip { position: absolute; inset: 0; }
 
-      /* ---------- Background ---------- */
+      /* ---------- Background: white + faint emerald ambient + grain (the desaturated stage) ---------- */
       #bg-fill { position: absolute; inset: 0; background: #ffffff; }
       #bg-vignette {
         position: absolute; inset: 0;
-        background: radial-gradient(120% 90% at 50% 42%, rgba(255,255,255,0) 55%, rgba(15,61,46,0.05) 100%);
+        background: radial-gradient(120% 92% at 50% 42%, rgba(255,255,255,0) 52%, rgba(15,61,46,0.055) 100%);
       }
       #bg-ambient {
-        position: absolute; left: 50%; top: 34%; width: 1100px; height: 1100px;
+        position: absolute; left: 50%; top: 40%; width: 1180px; height: 1180px;
         transform: translate(-50%, -50%);
-        background: radial-gradient(circle, rgba(16,185,129,0.16) 0%, rgba(20,67,42,0.06) 38%, rgba(255,255,255,0) 66%);
-        filter: blur(10px);
+        background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, rgba(20,67,42,0.05) 40%, rgba(255,255,255,0) 68%);
+        filter: blur(14px);
+      }
+      /* Faint flickering-grid nod to the real AuroraBackground (desaturated so it never competes with the orb) */
+      #bg-grid {
+        position: absolute; inset: 0; opacity: 0.5;
+        background-image:
+          linear-gradient(rgba(16,185,129,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(16,185,129,0.05) 1px, transparent 1px);
+        background-size: 46px 46px;
+        -webkit-mask-image: radial-gradient(120% 100% at 50% 42%, #000 30%, transparent 78%);
+        mask-image: radial-gradient(120% 100% at 50% 42%, #000 30%, transparent 78%);
       }
       #bg-grain {
-        position: absolute; inset: 0; opacity: 0.05; mix-blend-mode: multiply;
+        position: absolute; inset: 0; opacity: 0.045; mix-blend-mode: multiply;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       }
 
-      /* ---------- The voice orb ---------- */
+      /* ---------- The voice orb — the only saturated thing on screen ---------- */
       #orbStage { display: block; }
       #orbHalo {
-        position: absolute; left: 50%; top: 40%; width: 620px; height: 620px;
+        position: absolute; left: 50%; top: 40%; width: 640px; height: 640px;
         transform: translate(-50%, -50%);
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(16,185,129,0.42) 0%, rgba(20,67,42,0.18) 42%, rgba(255,255,255,0) 70%);
-        filter: blur(38px);
+        background: radial-gradient(circle, rgba(16,185,129,0.40) 0%, rgba(20,67,42,0.16) 44%, rgba(255,255,255,0) 70%);
+        filter: blur(44px);
       }
       #orb {
-        position: absolute; left: 50%; top: 40%; width: 336px; height: 336px;
+        position: absolute; left: 50%; top: 40%; width: 340px; height: 340px;
         transform: translate(-50%, -50%);
         border-radius: 50%;
         background:
-          radial-gradient(circle at 33% 27%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0) 20%),
-          radial-gradient(circle at 50% 56%, #6ee7b7 0%, #10b981 34%, #0b7a52 63%, #06281c 100%);
+          radial-gradient(circle at 34% 26%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 22%),
+          radial-gradient(circle at 50% 58%, #7ff0c1 0%, #10b981 33%, #0b7a52 62%, #06281c 100%);
         box-shadow:
-          inset 0 10px 34px rgba(255,255,255,0.38),
-          inset 0 -26px 60px rgba(6,40,28,0.85),
-          0 34px 90px rgba(20,67,42,0.32);
+          inset 0 12px 38px rgba(255,255,255,0.42),
+          inset 0 -30px 66px rgba(6,40,28,0.9),
+          inset 0 0 0 1px rgba(255,255,255,0.06),
+          0 40px 100px rgba(20,67,42,0.30);
       }
+      /* Bright inner core seen "through the glass" */
       #orbGlow {
-        position: absolute; left: 50%; top: 52%; width: 60%; height: 60%;
+        position: absolute; left: 50%; top: 54%; width: 58%; height: 58%;
         transform: translate(-50%, -50%);
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(190,255,225,0.95) 0%, rgba(16,185,129,0.55) 45%, rgba(16,185,129,0) 72%);
-        mix-blend-mode: screen; filter: blur(4px);
+        background: radial-gradient(circle, rgba(200,255,231,0.98) 0%, rgba(16,185,129,0.5) 46%, rgba(16,185,129,0) 72%);
+        mix-blend-mode: screen; filter: blur(5px);
       }
+      /* Crisp top-left glass reflection */
       #orbSheen {
-        position: absolute; left: 30%; top: 22%; width: 120px; height: 74px;
-        transform: rotate(-24deg);
+        position: absolute; left: 28%; top: 20%; width: 134px; height: 82px;
+        transform: rotate(-26deg);
         border-radius: 50%;
-        background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 70%);
+        background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 68%);
         filter: blur(3px);
+      }
+      /* Small secondary caustic highlight lower-right for glassy depth */
+      #orbSpark {
+        position: absolute; left: 66%; top: 70%; width: 44px; height: 30px;
+        transform: rotate(18deg);
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 50%, rgba(220,255,240,0.75) 0%, rgba(220,255,240,0) 70%);
+        filter: blur(2px); mix-blend-mode: screen;
       }
 
       /* ---------- Shared text ---------- */
@@ -89,34 +119,43 @@
         align-items: center; text-align: center;
       }
       .eyebrow {
-        font-family: var(--font-body); font-weight: 600; font-size: 20px;
-        letter-spacing: 0.2em; text-transform: uppercase; color: var(--forest);
+        font-family: var(--font-body); font-weight: 600; font-size: 19px;
+        letter-spacing: 0.22em; text-transform: uppercase; color: var(--forest);
       }
       .display { font-family: var(--font-display); font-weight: 700; color: var(--ink); }
-      .status { font-family: var(--font-body); font-size: 30px; color: var(--muted); }
+      .status { font-family: var(--font-body); font-size: 29px; color: var(--muted); }
 
-      /* Scene 1 */
-      #s1-head { font-family: var(--font-display); font-weight: 700; font-size: 72px; color: var(--ink); }
+      /* Scene 1 — hero */
+      #s1-eyebrow { font-family: var(--font-body); font-weight: 600; font-size: 19px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--forest); }
+      #s1-head { font-family: var(--font-display); font-weight: 700; font-size: 74px; letter-spacing: -0.01em; color: var(--ink); }
+      #s1-note {
+        position: absolute; font-family: var(--font-hand); font-weight: 600;
+        font-size: 52px; color: var(--forest); transform: rotate(-8deg);
+        left: 1170px; top: 300px; white-space: nowrap;
+      }
+      #s1-arrow { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; pointer-events: none; }
 
       /* Scene 2 */
       #s2-mic {
-        width: 118px; height: 118px; border-radius: 50%;
+        width: 120px; height: 120px; border-radius: 50%;
         background: var(--forest); color: #fff;
         display: grid; place-items: center;
-        box-shadow: 0 14px 34px rgba(20,67,42,0.34), inset 0 1px 0 rgba(255,255,255,0.18);
+        box-shadow: 0 16px 38px rgba(20,67,42,0.34), inset 0 1px 0 rgba(255,255,255,0.18);
       }
       #s2-mic svg { width: 52px; height: 52px; }
       #s2-ripple {
-        position: absolute; left: 50%; top: 50%; width: 118px; height: 118px;
+        position: absolute; left: 50%; top: 50%; width: 120px; height: 120px;
         transform: translate(-50%, -50%); border-radius: 50%;
         border: 3px solid rgba(20,67,42,0.5);
       }
       #s2-cursor { position: absolute; width: 40px; height: 40px; }
       #s2-transcript-line {
         position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap;
-        font-family: var(--font-body); font-style: italic; font-size: 30px; color: var(--muted);
+        font-family: var(--font-body); font-size: 30px; color: var(--muted);
       }
-      .tchar { display: inline; }
+      #s2-ask { font-style: normal; }
+      #s2-typewrap { display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: bottom; }
+      #s2-typed { display: inline-block; font-style: italic; }
       .quote { color: var(--forest); font-style: normal; }
 
       /* Scene 3 */
@@ -127,69 +166,80 @@
         background: var(--slate50);
         border: 1px solid var(--line);
         border-left: 6px solid var(--forest);
-        border-radius: 12px;
-        padding: 30px 38px;
-        font-size: 34px; line-height: 1.5; color: var(--ink);
-        box-shadow: 0 20px 50px rgba(15,23,42,0.08);
+        border-radius: 14px;
+        padding: 32px 40px;
+        font-size: 35px; line-height: 1.5; color: var(--ink);
+        box-shadow: 0 22px 54px rgba(15,23,42,0.08);
       }
 
       /* Scene 4 */
-      #s4-cards { display: flex; gap: 34px; justify-content: center; }
+      #s4-cards { display: flex; gap: 36px; justify-content: center; }
       .fcard {
-        width: 430px; background: #ffffff;
-        border: 1px solid var(--line); border-radius: 16px;
-        padding: 40px 38px; text-align: left;
-        box-shadow: 0 24px 60px rgba(15,23,42,0.08);
+        width: 434px; background: #ffffff;
+        border: 1px solid var(--line); border-radius: 18px;
+        padding: 42px 40px; text-align: left;
+        box-shadow: 0 26px 64px rgba(15,23,42,0.08);
       }
       .fdot { width: 20px; height: 20px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 0 6px rgba(16,185,129,0.14); }
-      .fstep { margin-top: 26px; font-family: var(--font-display); font-weight: 700; font-size: 40px; color: var(--ink); }
+      .fstep { margin-top: 28px; font-family: var(--font-display); font-weight: 700; font-size: 40px; color: var(--ink); }
       .fdesc { margin-top: 10px; font-size: 26px; color: var(--muted); }
       #s4-sub { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; font-size: 30px; color: var(--muted); }
       #s4-sub b { color: var(--forest); font-weight: 600; }
 
       /* Scene 5 */
       #s5-p1 { font-family: var(--font-display); font-weight: 600; font-size: 46px; color: var(--muted); }
-      #s5-p2 { font-family: var(--font-display); font-weight: 700; font-size: 66px; color: var(--ink); margin-top: 14px; }
+      #s5-p2 { font-family: var(--font-display); font-weight: 700; font-size: 68px; letter-spacing: -0.01em; color: var(--ink); margin-top: 14px; }
       #s5-markdot {
-        width: 62px; height: 62px; border-radius: 50%;
+        width: 64px; height: 64px; border-radius: 50%;
         background:
-          radial-gradient(circle at 34% 28%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 22%),
-          radial-gradient(circle at 50% 56%, #6ee7b7 0%, #10b981 36%, #0b7a52 66%, #06281c 100%);
-        box-shadow: 0 10px 26px rgba(20,67,42,0.32);
+          radial-gradient(circle at 34% 26%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0) 24%),
+          radial-gradient(circle at 50% 58%, #7ff0c1 0%, #10b981 34%, #0b7a52 64%, #06281c 100%);
+        box-shadow: 0 12px 28px rgba(20,67,42,0.30);
       }
-      #s5-name { font-family: var(--font-display); font-weight: 700; font-size: 72px; color: var(--ink); margin-top: 24px; }
-      #s5-tag { font-family: var(--font-body); font-size: 30px; letter-spacing: 0.04em; color: var(--forest); margin-top: 12px; }
+      #s5-name { font-family: var(--font-display); font-weight: 700; font-size: 72px; letter-spacing: -0.01em; color: var(--ink); margin-top: 26px; }
+      #s5-tag { font-family: var(--font-body); font-size: 30px; letter-spacing: 0.05em; color: var(--forest); margin-top: 12px; }
     </style>
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="22" data-width="1920" data-height="1080">
 
-      <!-- Track 0 — background (persistent) -->
+      <!-- Track 0 — background (persistent, desaturated) -->
       <div id="bg" class="clip" data-start="0" data-duration="22" data-track-index="0">
         <div id="bg-fill"></div>
+        <div id="bg-grid"></div>
         <div id="bg-ambient"></div>
         <div id="bg-vignette"></div>
         <div id="bg-grain"></div>
       </div>
 
       <!-- Track 1 — the voice orb (persistent across hook → listen → think → speak) -->
-      <div id="orbStage" class="clip" data-start="0" data-duration="13" data-track-index="1">
+      <div id="orbStage" class="clip" data-start="0" data-duration="13.4" data-track-index="1">
         <div id="orbHalo"></div>
         <div id="orb">
           <div id="orbGlow"></div>
           <div id="orbSheen"></div>
+          <div id="orbSpark"></div>
         </div>
       </div>
 
-      <!-- Track 2 — Scene 1: the orb wakes -->
-      <div id="s1" class="clip" data-start="0" data-duration="3.7" data-track-index="2">
-        <div id="s1-head" class="center-col" style="top: 690px;">Talk to us. We&rsquo;re listening.</div>
+      <!-- Track 2 — Scene 1: the orb wakes, with the handwritten "AI-Powered" note -->
+      <div id="s1" class="clip" data-start="0" data-duration="4.0" data-track-index="2">
+        <div id="s1-eyebrow" class="center-col" style="top: 214px;">Open now · 24/7 emergency service</div>
+        <div id="s1-head" class="center-col" style="top: 700px;">Press. Speak. It answers.</div>
+        <!-- handwritten AI-Powered note + hand-drawn curved arrow pointing at the orb -->
+        <div id="s1-note">AI-Powered</div>
+        <svg id="s1-arrow" viewBox="0 0 1920 1080">
+          <path id="s1-arrow-path" d="M 1198 372 C 1226 424, 1188 470, 1120 470"
+                fill="none" stroke="#14432a" stroke-width="4" stroke-linecap="round" />
+          <path id="s1-arrow-head" d="M 1120 470 L 1146 452 M 1120 470 L 1138 496"
+                fill="none" stroke="#14432a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       </div>
 
-      <!-- Track 3 — Scene 2: press & speak -->
+      <!-- Track 3 — Scene 2: tap to talk → listening -->
       <div id="s2" class="clip" data-start="3.4" data-duration="5" data-track-index="3">
         <div id="s2-inner">
-          <div id="s2-status" class="status center-col" style="top: 636px;">We&rsquo;re listening.</div>
+          <div id="s2-status" class="status center-col" style="top: 636px;">We&rsquo;re listening&hellip;</div>
           <div class="center-col" style="top: 690px;">
             <div style="position: relative;">
               <div id="s2-ripple"></div>
@@ -202,8 +252,8 @@
               </div>
             </div>
           </div>
-          <div id="s2-transcript-line" style="top: 860px;">
-            <span class="quote">You asked: &ldquo;</span><span id="s2-transcript"></span><span class="quote">&rdquo;</span>
+          <div id="s2-transcript-line" style="top: 862px;">
+            <span id="s2-ask">You asked: </span><span id="s2-typewrap" data-layout-allow-overflow><span id="s2-typed"><span class="quote">&ldquo;</span>Do you handle burst pipes at 2am?<span class="quote">&rdquo;</span></span></span>
           </div>
           <svg id="s2-cursor" viewBox="0 0 24 24">
             <path d="M4 2 L4 21 L9.2 15.6 L12.6 22.4 L15.1 21.3 L11.7 14.6 L18.4 14.4 Z" fill="#1f2937" stroke="#ffffff" stroke-width="1.3" stroke-linejoin="round" />
@@ -211,22 +261,22 @@
         </div>
       </div>
 
-      <!-- Track 4 — Scene 3: think, then answer -->
-      <div id="s3" class="clip" data-start="7.9" data-duration="5" data-track-index="4">
+      <!-- Track 4 — Scene 3: think, then speak the answer -->
+      <div id="s3" class="clip" data-start="7.9" data-duration="5.5" data-track-index="4">
         <div id="s3-inner">
           <div id="s3-status1" class="status center-col" style="top: 636px;">Finding your answer&hellip;</div>
           <div id="s3-status2" class="status center-col" style="top: 636px; opacity: 0;">Here&rsquo;s your answer&hellip;</div>
           <div id="s3-dots" class="center-col" style="top: 700px; flex-direction: row; justify-content: center;">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           </div>
-          <div class="center-col" style="top: 726px;">
+          <div class="center-col" style="top: 728px;">
             <div id="s3-card">Yes &mdash; licensed plumbers on call 24/7, usually at your door within 45 minutes.</div>
           </div>
         </div>
       </div>
 
       <!-- Track 5 — Scene 4: under the hood -->
-      <div id="s4" class="clip" data-start="12.5" data-duration="4.9" data-track-index="5">
+      <div id="s4" class="clip" data-start="13.4" data-duration="4.6" data-track-index="5">
         <div id="s4-inner">
           <div id="s4-eyebrow" class="eyebrow center-col" style="top: 300px;">How it works</div>
           <div id="s4-cards" class="center-col" style="top: 392px; flex-direction: row; justify-content: center;">
@@ -234,12 +284,12 @@
             <div id="s4-c2" class="fcard"><div class="fdot"></div><div class="fstep">Thinks</div><div class="fdesc">LLaMA reasons over it</div></div>
             <div id="s4-c3" class="fcard"><div class="fdot"></div><div class="fstep">Speaks back</div><div class="fdesc">Piper text-to-speech</div></div>
           </div>
-          <div id="s4-sub" style="top: 700px;">orchestrated in <b>n8n</b> &middot; self-hosted &middot; real-time</div>
+          <div id="s4-sub" style="top: 706px;">orchestrated in <b>n8n</b> &middot; self-hosted &middot; real-time</div>
         </div>
       </div>
 
       <!-- Track 6 — Scene 5: it could run inside yours -->
-      <div id="s5" class="clip" data-start="17.1" data-duration="4.9" data-track-index="6">
+      <div id="s5" class="clip" data-start="17.6" data-duration="4.4" data-track-index="6">
         <div id="s5-inner">
           <div id="s5-p1" class="center-col" style="top: 430px;">It&rsquo;s running inside a plumbing site.</div>
           <div id="s5-p2" class="center-col" style="top: 496px;">It could run inside yours.</div>
@@ -251,117 +301,125 @@
         </div>
       </div>
 
-      <!-- Audio: music bed + motion-matched SFX (framework-owned playback) -->
-      <audio id="music" src="assets/music/happy-beats-business-moves-vol-1-by-ende-dot-app.mp3" data-start="0" data-duration="22" data-track-index="8" data-volume="0.55"></audio>
-      <audio id="sfx-tap" src="assets/sfx/tap.ogg" data-start="4.0" data-duration="0.2" data-track-index="9" data-volume="0.5"></audio>
-      <audio id="sfx-key1" src="assets/sfx/key.wav" data-start="4.72" data-duration="0.25" data-track-index="10" data-volume="0.26"></audio>
-      <audio id="sfx-key2" src="assets/sfx/key.wav" data-start="5.22" data-duration="0.25" data-track-index="10" data-volume="0.26"></audio>
-      <audio id="sfx-key3" src="assets/sfx/key.wav" data-start="5.72" data-duration="0.25" data-track-index="10" data-volume="0.26"></audio>
-      <audio id="sfx-key4" src="assets/sfx/key.wav" data-start="6.22" data-duration="0.25" data-track-index="10" data-volume="0.26"></audio>
-      <audio id="sfx-answer" src="assets/sfx/answer.ogg" data-start="10.0" data-duration="1.2" data-track-index="9" data-volume="0.5"></audio>
-      <audio id="sfx-card1" src="assets/sfx/card.ogg" data-start="13.02" data-duration="0.12" data-track-index="9" data-volume="0.42"></audio>
-      <audio id="sfx-card2" src="assets/sfx/card.ogg" data-start="14.02" data-duration="0.12" data-track-index="9" data-volume="0.42"></audio>
-      <audio id="sfx-card3" src="assets/sfx/card.ogg" data-start="15.02" data-duration="0.12" data-track-index="9" data-volume="0.42"></audio>
-      <audio id="sfx-slam" src="assets/sfx/slam.ogg" data-start="20.02" data-duration="0.18" data-track-index="9" data-volume="0.6"></audio>
+      <!-- Audio: custom calm ambient bed (beatless) + soft, motion-matched SFX -->
+      <audio id="music" src="assets/music/calm-ambient-pad.wav" data-start="0" data-duration="22" data-track-index="8" data-volume="0.7"></audio>
+      <audio id="sfx-tap" src="assets/sfx/tap.ogg" data-start="4.0" data-duration="0.2" data-track-index="9" data-volume="0.4"></audio>
+      <audio id="sfx-key1" src="assets/sfx/key.wav" data-start="4.72" data-duration="0.25" data-track-index="10" data-volume="0.2"></audio>
+      <audio id="sfx-key2" src="assets/sfx/key.wav" data-start="5.22" data-duration="0.25" data-track-index="10" data-volume="0.2"></audio>
+      <audio id="sfx-key3" src="assets/sfx/key.wav" data-start="5.72" data-duration="0.25" data-track-index="10" data-volume="0.2"></audio>
+      <audio id="sfx-key4" src="assets/sfx/key.wav" data-start="6.22" data-duration="0.25" data-track-index="10" data-volume="0.2"></audio>
+      <audio id="sfx-answer" src="assets/sfx/answer.ogg" data-start="10.05" data-duration="1.2" data-track-index="9" data-volume="0.42"></audio>
+      <audio id="sfx-card1" src="assets/sfx/card.ogg" data-start="13.9" data-duration="0.12" data-track-index="9" data-volume="0.34"></audio>
+      <audio id="sfx-card2" src="assets/sfx/card.ogg" data-start="14.7" data-duration="0.12" data-track-index="9" data-volume="0.34"></audio>
+      <audio id="sfx-card3" src="assets/sfx/card.ogg" data-start="15.5" data-duration="0.12" data-track-index="9" data-volume="0.34"></audio>
+      <audio id="sfx-confirm" src="assets/sfx/answer.ogg" data-start="19.75" data-duration="1.0" data-track-index="9" data-volume="0.4"></audio>
     </div>
 
     <script>
-      // Build the transcript as per-character spans (synchronous, deterministic) for a typewriter reveal.
-      (function buildTranscript() {
-        var q = "Do you handle burst pipes at 2am?";
-        var el = document.getElementById("s2-transcript");
-        for (var i = 0; i < q.length; i++) {
-          var s = document.createElement("span");
-          s.className = "tchar";
-          s.textContent = q[i] === " " ? " " : q[i];
-          el.appendChild(s);
-        }
-      })();
+      // Typewriter reveal via a measured width-wipe (deterministic): the closing
+      // quote hugs the text as it types, instead of the untyped chars reserving space.
+      var typeWrap = document.getElementById("s2-typewrap");
+      var typeW = Math.ceil(document.getElementById("s2-typed").getBoundingClientRect().width);
+      typeWrap.style.width = typeW + "px";
 
       window.__timelines = window.__timelines || {};
       var tl = gsap.timeline({ paused: true });
 
-      /* ============ Background (subtle, beat-paced ambient breathing) ============ */
-      // 120 BPM track → ~1.0s cycle. Deterministic stand-in for music-reactive glow
-      // (per-frame audio extraction is unavailable in this environment — see brief).
-      tl.fromTo("#bg-ambient", { opacity: 0.5, scale: 0.97 },
-        { opacity: 0.78, scale: 1.03, duration: 1.0, ease: "sine.inOut", yoyo: true, repeat: 21 }, 0);
+      /* ============ Background — slow calm ambient breathing (matches the beatless pad) ============ */
+      // Story-paced, not beat-locked: the ambient track has no percussion, so nothing snaps to a grid.
+      tl.fromTo("#bg-ambient", { opacity: 0.55, scale: 0.98 },
+        { opacity: 0.8, scale: 1.03, duration: 2.6, ease: "sine.inOut", yoyo: true, repeat: 8 }, 0);
 
-      /* ============ Scene 1 — the orb wakes (0–3.7) ============ */
-      tl.from("#orbHalo", { scale: 0.5, autoAlpha: 0, duration: 1.1, ease: "power2.out" }, 0.05);
-      tl.from("#orb", { scale: 0.55, autoAlpha: 0, duration: 0.9, ease: "power3.out" }, 0.0);
-      tl.from("#orbGlow", { opacity: 0, duration: 1.0, ease: "power2.out" }, 0.3);
+      /* ============ Scene 1 — the orb wakes + handwritten note (0–4.0) ============ */
+      tl.from("#orbHalo", { scale: 0.5, autoAlpha: 0, duration: 1.2, ease: "power2.out" }, 0.05);
+      tl.from("#orb", { scale: 0.55, autoAlpha: 0, duration: 1.0, ease: "power3.out" }, 0.0);
+      tl.from("#orbGlow", { opacity: 0, duration: 1.1, ease: "power2.out" }, 0.3);
+      tl.from("#orbSpark", { opacity: 0, duration: 0.8, ease: "power2.out" }, 0.6);
       // gentle idle breathing before the interaction
-      tl.to("#orb", { scale: 1.03, duration: 1.3, ease: "sine.inOut", yoyo: true, repeat: 1 }, 1.1);
-      tl.from("#s1-head", { y: 26, autoAlpha: 0, duration: 0.7, ease: "power3.out" }, 0.75);
-      tl.to("#s1-head", { autoAlpha: 0, duration: 0.35, ease: "power1.in" }, 3.35);
+      tl.to("#orb", { scale: 1.03, duration: 1.5, ease: "sine.inOut", yoyo: true, repeat: 1 }, 1.2);
+      tl.from("#s1-eyebrow", { y: -14, autoAlpha: 0, duration: 0.7, ease: "power2.out" }, 0.55);
+      tl.from("#s1-head", { y: 26, autoAlpha: 0, duration: 0.75, ease: "power3.out" }, 0.9);
+      // handwritten note pops, then the arrow draws on toward the orb (a human beat)
+      tl.from("#s1-note", { autoAlpha: 0, scale: 0.86, rotation: -16, transformOrigin: "50% 100%", duration: 0.5, ease: "back.out(1.7)" }, 1.5);
+      // draw-on via stroke-dashoffset (seek-safe, no plugins)
+      (function primeArrow() {
+        var p = document.getElementById("s1-arrow-path");
+        var len = p.getTotalLength ? p.getTotalLength() : 160;
+        p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
+        p.setAttribute("data-len", len);
+      })();
+      tl.to("#s1-arrow-path", { strokeDashoffset: 0, duration: 0.55, ease: "power2.inOut" }, 1.9);
+      tl.from("#s1-arrow-head", { autoAlpha: 0, duration: 0.2 }, 2.4);
+      // exit scene 1 text (orb stays, note/arrow fade)
+      tl.to(["#s1-eyebrow", "#s1-head"], { autoAlpha: 0, duration: 0.4, ease: "power1.in" }, 3.55);
+      tl.to(["#s1-note", "#s1-arrow"], { autoAlpha: 0, duration: 0.4, ease: "power1.in" }, 3.35);
 
-      /* ============ Scene 2 — press & speak (3.4–8.4) ============ */
-      tl.from("#s2-status", { autoAlpha: 0, y: 10, duration: 0.4 }, 3.6);
-      tl.from("#s2-mic", { autoAlpha: 0, scale: 0.8, duration: 0.4, ease: "back.out(2)" }, 3.5);
+      /* ============ Scene 2 — tap to talk → listening (3.4–8.4) ============ */
+      tl.from("#s2-status", { autoAlpha: 0, y: 10, duration: 0.4 }, 3.7);
+      tl.from("#s2-mic", { autoAlpha: 0, scale: 0.8, duration: 0.4, ease: "back.out(1.9)" }, 3.5);
       // cursor glides in and taps the mic button
       gsap.set("#s2-cursor", { x: 1150, y: 812 });
-      tl.to("#s2-cursor", { x: 1000, y: 742, duration: 0.5, ease: "power2.inOut" }, 3.5);
-      tl.to("#s2-cursor", { scale: 0.86, duration: 0.09, yoyo: true, repeat: 1, ease: "power1.inOut" }, 3.98);
-      tl.to("#s2-cursor", { autoAlpha: 0, duration: 0.3 }, 4.25);
+      tl.to("#s2-cursor", { x: 1000, y: 744, duration: 0.55, ease: "power2.inOut" }, 3.55);
+      tl.to("#s2-cursor", { scale: 0.86, duration: 0.1, yoyo: true, repeat: 1, ease: "power1.inOut" }, 3.98);
+      tl.to("#s2-cursor", { autoAlpha: 0, duration: 0.3 }, 4.28);
       // press feedback + ripple
       tl.to("#s2-mic", { scale: 0.92, duration: 0.1, yoyo: true, repeat: 1, ease: "power1.inOut" }, 3.98);
       gsap.set("#s2-ripple", { opacity: 0, scale: 1 });
-      tl.fromTo("#s2-ripple", { opacity: 0.55, scale: 1 }, { opacity: 0, scale: 2.6, duration: 0.7, ease: "power2.out" }, 4.0);
-      // orb enters "listening" — surface warps with the voice (asymmetric breathing)
-      tl.to("#orb", { scaleX: 1.055, scaleY: 0.955, duration: 0.27, ease: "sine.inOut", yoyo: true, repeat: 12 }, 4.3);
-      tl.to("#orbGlow", { opacity: 1, scale: 1.06, duration: 0.5, ease: "power2.out" }, 4.3);
+      tl.fromTo("#s2-ripple", { opacity: 0.55, scale: 1 }, { opacity: 0, scale: 2.6, duration: 0.8, ease: "power2.out" }, 4.0);
+      // orb enters "listening" — surface warps live with the voice (asymmetric breathing)
+      tl.to("#orb", { scaleX: 1.06, scaleY: 0.95, duration: 0.27, ease: "sine.inOut", yoyo: true, repeat: 12 }, 4.3);
+      tl.to("#orbGlow", { opacity: 1, scale: 1.07, duration: 0.5, ease: "power2.out" }, 4.3);
       // transcript types in, then holds
-      tl.from(".tchar", { autoAlpha: 0, duration: 0.01, stagger: 0.05, ease: "none" }, 4.7);
       tl.from("#s2-transcript-line", { autoAlpha: 0, duration: 0.3 }, 4.55);
-      tl.to("#s2-inner", { autoAlpha: 0, duration: 0.32, ease: "power1.in" }, 8.05);
+      tl.fromTo("#s2-typewrap", { width: 0 }, { width: typeW, duration: 1.5, ease: "steps(22)" }, 4.7);
+      tl.to("#s2-inner", { autoAlpha: 0, duration: 0.34, ease: "power1.in" }, 8.05);
 
-      /* ============ Scene 3 — think, then answer (7.9–12.9) ============ */
+      /* ============ Scene 3 — think, then speak (7.9–13.4) ============ */
       // reset the orb surface, then a restless "thinking" spin
       tl.to("#orb", { scaleX: 1, scaleY: 1, duration: 0.3, ease: "power2.out" }, 7.95);
       tl.to("#orbGlow", { opacity: 0.7, scale: 1.0, duration: 0.4 }, 7.95);
-      tl.to("#orb", { rotation: "+=120", duration: 1.7, ease: "power1.inOut" }, 8.0);
+      tl.to("#orb", { rotation: "+=130", duration: 1.9, ease: "power1.inOut" }, 8.0);
       tl.from("#s3-status1", { autoAlpha: 0, y: 8, duration: 0.35 }, 8.05);
       tl.from("#s3-dots .dot", { autoAlpha: 0, scale: 0, duration: 0.3, stagger: 0.12, ease: "back.out(2)" }, 8.2);
       tl.to("#s3-dots .dot", { scale: 1.35, duration: 0.34, ease: "sine.inOut", yoyo: true, repeat: 3, stagger: 0.14 }, 8.5);
-      tl.to("#s3-dots", { autoAlpha: 0, duration: 0.3 }, 9.55);
-      tl.to("#s3-status1", { autoAlpha: 0, duration: 0.3 }, 9.6);
-      // orb enters "speaking" — rhythmic pulse + brighter core as the answer is voiced
-      tl.to("#s3-status2", { autoAlpha: 1, duration: 0.35 }, 9.75);
-      tl.to("#orb", { scale: 1.05, duration: 0.32, ease: "sine.inOut", yoyo: true, repeat: 7 }, 9.8);
-      tl.to("#orbGlow", { opacity: 1, scale: 1.12, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 7 }, 9.8);
-      tl.from("#s3-card", { autoAlpha: 0, y: 24, duration: 0.5, ease: "power3.out" }, 9.9);
-      tl.to("#s3-inner", { autoAlpha: 0, duration: 0.32, ease: "power1.in" }, 12.55);
+      tl.to("#s3-dots", { autoAlpha: 0, duration: 0.3 }, 9.6);
+      tl.to("#s3-status1", { autoAlpha: 0, duration: 0.3 }, 9.65);
+      // orb enters "speaking" — rhythmic swell + brighter core as the answer is voiced
+      tl.to("#s3-status2", { autoAlpha: 1, duration: 0.35 }, 9.8);
+      tl.to("#orb", { scale: 1.05, duration: 0.34, ease: "sine.inOut", yoyo: true, repeat: 7 }, 9.85);
+      tl.to("#orbGlow", { opacity: 1, scale: 1.13, duration: 0.32, ease: "sine.inOut", yoyo: true, repeat: 7 }, 9.85);
+      tl.from("#s3-card", { autoAlpha: 0, y: 24, duration: 0.55, ease: "power3.out" }, 9.95);
+      tl.to("#s3-inner", { autoAlpha: 0, duration: 0.34, ease: "power1.in" }, 13.0);
       // orb settles and fades out with the scene
-      tl.to("#orb", { scale: 1, duration: 0.3 }, 12.4);
-      tl.to(["#orb", "#orbHalo", "#orbGlow"], { autoAlpha: 0, duration: 0.5, ease: "power1.in" }, 12.5);
+      tl.to("#orb", { scale: 1, duration: 0.3 }, 12.85);
+      tl.to(["#orb", "#orbHalo", "#orbGlow", "#orbSheen", "#orbSpark"], { autoAlpha: 0, duration: 0.55, ease: "power1.in" }, 12.9);
 
-      /* ============ Scene 4 — under the hood (12.5–17.4) ============ */
-      tl.from("#s4-eyebrow", { autoAlpha: 0, y: 12, duration: 0.4, ease: "power2.out" }, 12.75);
-      // three stack cards arrive one by one, snapped to the 120 BPM grid
-      tl.from("#s4-c1", { autoAlpha: 0, y: 34, duration: 0.5, ease: "power3.out" }, 13.02); // beat-grid: card 1 @ 13.02s
-      tl.from("#s4-c2", { autoAlpha: 0, y: 34, duration: 0.5, ease: "power3.out" }, 14.02); // beat-grid: card 2 @ 14.02s
-      tl.from("#s4-c3", { autoAlpha: 0, y: 34, duration: 0.5, ease: "power3.out" }, 15.02); // beat-grid: card 3 @ 15.02s
-      tl.from("#s4-sub", { autoAlpha: 0, y: 12, duration: 0.5, ease: "power2.out" }, 15.7);
-      tl.to("#s4-inner", { autoAlpha: 0, duration: 0.32, ease: "power1.in" }, 17.05);
+      /* ============ Scene 4 — under the hood (13.4–18.0) ============ */
+      tl.from("#s4-eyebrow", { autoAlpha: 0, y: 12, duration: 0.4, ease: "power2.out" }, 13.6);
+      // three stack cards arrive one by one, story-paced ~0.8s apart (calm, readable)
+      tl.from("#s4-c1", { autoAlpha: 0, y: 34, duration: 0.55, ease: "power3.out" }, 13.9);
+      tl.from("#s4-c2", { autoAlpha: 0, y: 34, duration: 0.55, ease: "power3.out" }, 14.7);
+      tl.from("#s4-c3", { autoAlpha: 0, y: 34, duration: 0.55, ease: "power3.out" }, 15.5);
+      tl.from("#s4-sub", { autoAlpha: 0, y: 12, duration: 0.5, ease: "power2.out" }, 16.3);
+      tl.to("#s4-inner", { autoAlpha: 0, duration: 0.34, ease: "power1.in" }, 17.55);
 
-      /* ============ Scene 5 — it could run inside yours (17.1–22) ============ */
+      /* ============ Scene 5 — it could run inside yours (17.6–22) ============ */
       gsap.set("#s5-mark", { autoAlpha: 0 });
-      tl.from("#s5-p1", { autoAlpha: 0, y: 18, duration: 0.5, ease: "power2.out" }, 17.35);
-      tl.from("#s5-p2", { autoAlpha: 0, y: 20, duration: 0.55, ease: "power3.out" }, 18.05);
-      tl.to(["#s5-p1", "#s5-p2"], { autoAlpha: 0, duration: 0.35, ease: "power1.in" }, 19.6);
-      // Wayforé wordmark slams in on the strong beat
-      tl.to("#s5-mark", { autoAlpha: 1, duration: 0.01 }, 20.02); // beat-locked: 20.02s (strong cue)
-      tl.from("#s5-markdot", { autoAlpha: 0, scale: 0.3, duration: 0.45, ease: "back.out(2)" }, 20.02); // beat-locked: 20.02s
-      tl.from("#s5-name", { autoAlpha: 0, scale: 1.08, y: 10, duration: 0.45, ease: "power3.out" }, 20.05);
-      tl.from("#s5-tag", { autoAlpha: 0, y: 12, duration: 0.5, ease: "power2.out" }, 20.35);
+      tl.from("#s5-p1", { autoAlpha: 0, y: 18, duration: 0.55, ease: "power2.out" }, 17.85);
+      tl.from("#s5-p2", { autoAlpha: 0, y: 20, duration: 0.6, ease: "power3.out" }, 18.5);
+      tl.to(["#s5-p1", "#s5-p2"], { autoAlpha: 0, duration: 0.38, ease: "power1.in" }, 19.75);
+      // Wayforé wordmark settles in (gentle, premium — no slam)
+      tl.to("#s5-mark", { autoAlpha: 1, duration: 0.01 }, 20.1);
+      tl.from("#s5-markdot", { autoAlpha: 0, scale: 0.4, duration: 0.6, ease: "power3.out" }, 20.1);
+      tl.from("#s5-name", { autoAlpha: 0, y: 12, duration: 0.55, ease: "power3.out" }, 20.2);
+      tl.from("#s5-tag", { autoAlpha: 0, y: 12, duration: 0.55, ease: "power2.out" }, 20.5);
 
-      /* ============ Music dynamics (fade in, gentle duck, fade out) ============ */
-      tl.from("#music", { volume: 0, duration: 0.5, ease: "power1.in" }, 0);
-      tl.to("#music", { volume: 0.4, duration: 0.4, ease: "power1.out" }, 8.2);   // duck under "thinking"
-      tl.to("#music", { volume: 0.55, duration: 0.5, ease: "power1.in" }, 9.9);   // back up on the answer
-      tl.to("#music", { volume: 0.63, duration: 0.5, ease: "power1.in" }, 12.85); // small lift into the stack
-      tl.to("#music", { volume: 0, duration: 1.6, ease: "power1.out" }, 20.4);    // fade out over the outro tail
+      /* ============ Music dynamics — calm bed, gentle fade in/out, tiny lift into the stack ============ */
+      tl.from("#music", { volume: 0, duration: 1.2, ease: "power1.in" }, 0);
+      tl.to("#music", { volume: 0.6, duration: 0.8, ease: "power1.out" }, 8.1);    // ease back slightly under "thinking"
+      tl.to("#music", { volume: 0.7, duration: 0.8, ease: "power1.in" }, 9.9);     // return on the answer
+      tl.to("#music", { volume: 0.76, duration: 0.8, ease: "power1.in" }, 13.7);   // tiny lift into the stack
+      tl.to("#music", { volume: 0, duration: 2.0, ease: "power1.out" }, 20.0);     // gentle fade to silence on the tail
 
       window.__timelines["main"] = tl;
     </script>
