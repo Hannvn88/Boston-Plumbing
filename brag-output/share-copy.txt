@@ -1,0 +1,1 @@
+We built a plumbing website — but the real product is the AI voice agent living inside it. Press once, ask out loud, and it answers back in real time: Whisper transcribes, LLaMA reasons, Piper speaks, all orchestrated in a self-hosted n8n flow. It's running inside a plumbing site. It could run inside yours. 🎙️ — Wayforé Studio
