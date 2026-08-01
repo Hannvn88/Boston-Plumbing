@@ -18,7 +18,7 @@ const INCLUDED = [
 export default function Pricing() {
   return (
     <section id="pricing" className="border-b border-slate-200 bg-white">
-      <div className="mx-auto w-full max-w-6xl px-4 py-24 sm:px-6 md:py-32">
+      <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 md:py-24">
         {/* Heading pushed right for asymmetry with the services section above */}
         <FadeUp className="max-w-xl lg:ml-auto lg:text-right">
           <h2 className="text-3xl font-bold tracking-tight text-gray-800 md:text-4xl">
@@ -30,7 +30,7 @@ export default function Pricing() {
         </FadeUp>
 
         {/* Offset columns: middle card drops lower, third floats higher */}
-        <div className="mt-14 grid items-start gap-6 lg:grid-cols-3">
+        <div className="mt-12 grid items-start gap-6 lg:grid-cols-3">
           {/* Emergency visit — the featured rate */}
           <FadeUp>
             <Card className="border-forest">

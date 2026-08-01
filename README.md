@@ -1,6 +1,6 @@
 # Boston Plumbing — Light, Modern Site + AI Voice Assistant
 
-White, premium-feeling plumbing service website built with **React**, **Tailwind CSS**, **shadcn/ui-style components** (heavily customized), and **Framer Motion**. Asymmetrical layouts throughout; the AI voice assistant is the primary feature — the hero "Get Help Now" CTA (with a handwritten "AI-Powered" note and curved arrow), a header shortcut, and a footer CTA all open it.
+White, premium-feeling plumbing service website built with **React**, **Tailwind CSS**, **shadcn/ui-style components** (heavily customized), and **Framer Motion**. The AI voice assistant is the product being showcased — a large breathing mic button is the hero's centerpiece, with a header shortcut and a footer CTA also opening it.
 
 ## Run
 
@@ -16,12 +16,12 @@ npm run build      # production build to /dist
 src/
   App.jsx                        # main component — owns voice-modal state
   components/
-    Header.jsx                   # minimal nav: text wordmark, links, phone, CTA
-    Hero.jsx                     # asymmetric hero (heading left, CTA right) over the aurora
+    Header.jsx                   # minimal nav: text wordmark, links, phone, CTA (solid bg — no backdrop-filter, it ghosts on sticky in Chromium)
+    Hero.jsx                     # heading left, large breathing voice-agent button right
     AuroraBackground.jsx         # light-mode aurora backdrop (Aceternity UI pattern)
     Services.jsx                 # service cards, scroll-reveal + hover lift
     Pricing.jsx                  # offset/staggered rate cards + inclusions panel
-    Testimonials.jsx             # staggered left/right reviews, stars beside names
+    Testimonials.jsx             # three-column review grid, stars beside names
     Footer.jsx                   # asymmetric CTA band + contact details
     VoiceAgentModal.jsx          # AnimatePresence modal, breathing aura, one-button flow
     FadeUp.jsx                   # reusable whileInView fade-in-up wrapper
@@ -36,10 +36,10 @@ src/
 ## Design
 
 - Light theme: white background with a barely-perceptible film-grain texture, `#1F2937` dark-charcoal text, `slate-600` muted text, **deep forest green `#14432A`** as the single sparing accent (flat solid color, no gradients). No orange, no dark mode.
-- Typography: **General Sans** (Fontshare) for headlines, **Inter** for body, **Caveat** for the handwritten "AI-Powered" note.
-- Aurora background (vendored Aceternity pattern, slate/green bands) flows continuously behind the full-viewport hero on a fast 10s cycle, both gradient layers animating; hero content centers vertically in the first screen.
-- Asymmetry by design: hero columns offset, pricing cards staggered at different heights, reviews alternate left/right, footer CTA band splits text/actions.
-- Framer Motion everywhere: staggered fade-in-up on load, smooth `whileInView` section reveals on scroll, hover scale + shadow on buttons, card hover lift, AnimatePresence modal fade + scale, pulsing-dot loading.
+- Typography: **General Sans** (Fontshare) for headlines, **Inter** for body.
+- Flickering-grid canvas backdrop behind the hero; sections size themselves from their content (no forced viewport heights or hardcoded min-heights).
+- Voice agent as hero centerpiece: a large circular mic button with a soft green halo, slow idle "breathing" pulse (scale + shadow bloom), and a clear pressed state.
+- Motion is deliberate and limited: staggered hero fade/slide on load, once-only `whileInView` section reveals, the voice button's idle pulse and press feedback. `prefers-reduced-motion` falls back to instant, fully visible states (`useReducedMotion` + `MotionConfig reducedMotion="user"`).
 
 ## Voice assistant
 

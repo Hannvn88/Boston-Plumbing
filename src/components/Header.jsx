@@ -11,10 +11,12 @@ const NAV_LINKS = [
   { label: 'Reviews', href: '#reviews' },
 ];
 
-// Slim white header — wordmark only, everything in one row
+// Slim white header — wordmark only, everything in one row.
+// Solid background on purpose: backdrop-filter on a sticky element leaves a
+// stale composited "ghost" copy of the bar painted mid-page in Chromium.
 export default function Header({ onAskAI }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* Text wordmark — no icon, display face */}
         <a href="#top" className="font-display text-lg font-bold tracking-tight text-gray-800">

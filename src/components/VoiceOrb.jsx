@@ -3,7 +3,7 @@
 // glowing through it. The shell warps live with the caller's voice while
 // listening, pulses rhythmically while the answer plays, and breathes at idle.
 import React, { useMemo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, Environment, Lightformer, MeshTransmissionMaterial } from '@react-three/drei';
 
@@ -131,7 +131,7 @@ export default function VoiceOrb({ state, analyserRef }) {
   stateRef.current = state;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -156,6 +156,6 @@ export default function VoiceOrb({ state, analyserRef }) {
           <ReactiveOrb stateRef={stateRef} analyserRef={analyserRef} />
         </Float>
       </Canvas>
-    </motion.div>
+    </m.div>
   );
 }

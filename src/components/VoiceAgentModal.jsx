@@ -2,7 +2,7 @@
 // enter/exit; a matte 3D orb reacts live to the conversation; one premium pill
 // button runs the whole flow: tap to talk, tap again to send.
 import React, { Suspense, lazy, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Mic, Square, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { startRecording, sendToWebhook, playAudioResponse, speakText } from '@/lib/voiceAgent';
@@ -23,7 +23,7 @@ function LoadingDots() {
   return (
     <div className="flex items-center justify-center gap-2 py-2" role="status" aria-label="Loading">
       {[0, 1, 2].map((dotIndex) => (
-        <motion.span
+        <m.span
           key={dotIndex}
           className="h-2.5 w-2.5 rounded-full bg-slate-400"
           animate={{ scale: [1, 1.2, 1] }}
@@ -118,7 +118,7 @@ export default function VoiceAgentModal({ open, onClose }) {
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           className="fixed inset-0 z-50 overflow-y-auto bg-gray-800/40 p-4 flex items-start justify-center sm:items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -127,7 +127,7 @@ export default function VoiceAgentModal({ open, onClose }) {
           onClick={handleClose}
         >
           {/* Modal panel — clicks inside must not close the overlay */}
-          <motion.div
+          <m.div
             role="dialog"
             aria-modal="true"
             aria-label="Boston Plumbing AI assistant"
@@ -164,7 +164,7 @@ export default function VoiceAgentModal({ open, onClose }) {
             {/* Conversation area: transcript, loading dots, then the answer */}
             <div className="mt-4 space-y-4">
               {transcript && (
-                <motion.p
+                <m.p
                   key={transcript}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -172,13 +172,13 @@ export default function VoiceAgentModal({ open, onClose }) {
                   className="text-base italic text-slate-600"
                 >
                   You asked: “{transcript}”
-                </motion.p>
+                </m.p>
               )}
 
               {assistantState === 'thinking' && <LoadingDots />}
 
               {answer && assistantState !== 'thinking' && (
-                <motion.div
+                <m.div
                   key={answer}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -186,17 +186,17 @@ export default function VoiceAgentModal({ open, onClose }) {
                   className="rounded-md border border-slate-200 border-l-4 border-l-forest bg-slate-50 p-4 text-base leading-relaxed text-gray-800"
                 >
                   {answer}
-                </motion.div>
+                </m.div>
               )}
 
               {errorMessage && (
-                <motion.p
+                <m.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="text-base font-medium text-red-700"
                 >
                   {errorMessage}
-                </motion.p>
+                </m.p>
               )}
             </div>
 
@@ -204,7 +204,7 @@ export default function VoiceAgentModal({ open, onClose }) {
                 The status line above carries the instructions; the button stays
                 labelled for screen readers via aria-label. */}
             <div className="mt-7 flex flex-col items-center">
-              <motion.button
+              <m.button
                 onClick={handleTalkClick}
                 disabled={isBusy}
                 aria-label={isListening ? 'Stop and send your question' : 'Tap to talk'}
@@ -236,7 +236,7 @@ export default function VoiceAgentModal({ open, onClose }) {
                 ) : (
                   <Mic className="h-7 w-7" aria-hidden="true" />
                 )}
-              </motion.button>
+              </m.button>
 
               {/* Lets the user interrupt playback instead of waiting it out */}
               {assistantState === 'speaking' && (
@@ -248,8 +248,8 @@ export default function VoiceAgentModal({ open, onClose }) {
                 </button>
               )}
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );
