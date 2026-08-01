@@ -10,7 +10,7 @@ export default function Footer({ onAskAI }) {
   return (
     <footer id="contact" className="border-t border-slate-200 bg-slate-50">
       {/* Closing CTA band — offset columns rather than centered */}
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-20 sm:px-6 md:py-24 lg:grid-cols-[1.3fr_1fr] lg:items-center">
+      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-16 sm:px-6 md:py-20 lg:grid-cols-[1.3fr_1fr] lg:items-center">
         <FadeUp>
           <h2 className="text-3xl font-bold tracking-tight text-gray-800 md:text-4xl">
             Need a plumber right now?

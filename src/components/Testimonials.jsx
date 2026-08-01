@@ -1,5 +1,5 @@
-// Testimonials.jsx — customer reviews in a staggered, asymmetrical layout;
-// star rating sits beside the reviewer's name, in the accent colour
+// Testimonials.jsx — customer reviews in a clean three-column grid; star
+// rating sits beside the reviewer's name, in the accent colour
 import React from 'react';
 import { Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,7 +30,7 @@ const REVIEWS = [
 // Compact five-star row in the accent colour, shown beside the reviewer's name
 function StarRating() {
   return (
-    <div className="flex gap-0.5" aria-label="Rated 5 out of 5 stars">
+    <div className="flex gap-0.5" role="img" aria-label="Rated 5 out of 5 stars">
       {[...Array(5)].map((_, starIndex) => (
         <Star key={starIndex} className="h-4 w-4 fill-forest text-forest" aria-hidden="true" />
       ))}
@@ -38,12 +38,13 @@ function StarRating() {
   );
 }
 
-// One review card — quote first, then name + stars on the same row
+// One review card — quote first, then name + stars pinned to the bottom so
+// all three cards align despite different quote lengths
 function ReviewCard({ review }) {
   return (
-    <Card>
-      <CardContent>
-        <blockquote className="text-base leading-relaxed text-gray-800">
+    <Card className="h-full">
+      <CardContent className="flex h-full flex-col">
+        <blockquote className="flex-1 text-base leading-relaxed text-gray-800">
           “{review.quote}”
         </blockquote>
         <footer className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-5">
@@ -58,28 +59,23 @@ function ReviewCard({ review }) {
   );
 }
 
-// Testimonials section — cards staggered left/right at varied widths
+// Testimonials section — three equal cards, revealed with a slight stagger
 export default function Testimonials() {
   return (
     <section id="reviews" className="bg-white">
-      <div className="mx-auto w-full max-w-6xl px-4 py-24 sm:px-6 md:py-32">
+      <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 md:py-24">
         <FadeUp className="max-w-xl">
           <h2 className="text-3xl font-bold tracking-tight text-gray-800 md:text-4xl">
             Trusted when it matters most.
           </h2>
         </FadeUp>
 
-        {/* Staggered column: cards alternate left / right at less-than-full width */}
-        <div className="mt-14 flex flex-col gap-8">
-          <FadeUp className="md:w-3/5 md:self-start">
-            <ReviewCard review={REVIEWS[0]} />
-          </FadeUp>
-          <FadeUp delay={0.1} className="md:w-3/5 md:self-end">
-            <ReviewCard review={REVIEWS[1]} />
-          </FadeUp>
-          <FadeUp delay={0.2} className="md:w-3/5 md:self-start md:ml-16">
-            <ReviewCard review={REVIEWS[2]} />
-          </FadeUp>
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {REVIEWS.map((review, index) => (
+            <FadeUp key={review.name} delay={index * 0.1} className="h-full">
+              <ReviewCard review={review} />
+            </FadeUp>
+          ))}
         </div>
       </div>
     </section>

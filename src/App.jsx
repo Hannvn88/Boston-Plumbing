@@ -1,5 +1,6 @@
 // App.jsx — main component; composes the page and owns the voice-modal state
 import React, { useState } from 'react';
+import { LazyMotion, MotionConfig, domAnimation } from 'framer-motion';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Services from './components/Services';
@@ -15,29 +16,35 @@ export default function App() {
   const openAssistant = () => setAssistantOpen(true);
 
   return (
-    <>
-      {/* Minimal sticky header */}
-      <Header onAskAI={openAssistant} />
+    // LazyMotion loads only the DOM animation + gesture features the site
+    // actually uses, so the `m` components below stay far lighter than `motion`
+    <LazyMotion features={domAnimation}>
+      {/* reducedMotion="user" strips transform animations (hover lifts, tap
+          scales) app-wide when the OS asks for reduced motion */}
+      <MotionConfig reducedMotion="user">
+        {/* Minimal sticky header */}
+        <Header onAskAI={openAssistant} />
 
-      <main>
-        {/* Headline, subheadline and the primary AI-assistant CTA */}
-        <Hero onAskAI={openAssistant} />
+        <main>
+          {/* Headline, subheadline and the primary AI-assistant CTA */}
+          <Hero onAskAI={openAssistant} />
 
-        {/* Service cards */}
-        <Services />
+          {/* Service cards */}
+          <Services />
 
-        {/* Service rates */}
-        <Pricing />
+          {/* Service rates */}
+          <Pricing />
 
-        {/* Customer reviews */}
-        <Testimonials />
-      </main>
+          {/* Customer reviews */}
+          <Testimonials />
+        </main>
 
-      {/* Contact / CTA footer */}
-      <Footer onAskAI={openAssistant} />
+        {/* Contact / CTA footer */}
+        <Footer onAskAI={openAssistant} />
 
-      {/* Voice assistant modal (AnimatePresence handles enter/exit) */}
-      <VoiceAgentModal open={assistantOpen} onClose={() => setAssistantOpen(false)} />
-    </>
+        {/* Voice assistant modal (AnimatePresence handles enter/exit) */}
+        <VoiceAgentModal open={assistantOpen} onClose={() => setAssistantOpen(false)} />
+      </MotionConfig>
+    </LazyMotion>
   );
 }

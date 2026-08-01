@@ -1,7 +1,7 @@
 // Services.jsx — six service cards with icons; light theme, subtle hover lift,
 // heading offset left with the grid breathing underneath
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Zap, Droplets, Waves, Flame, Clock, Wrench } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import FadeUp from './FadeUp';
@@ -20,7 +20,7 @@ const SERVICES = [
 export default function Services() {
   return (
     <section id="services" className="border-b border-slate-200 bg-white">
-      <div className="mx-auto w-full max-w-6xl px-4 py-24 sm:px-6 md:py-32">
+      <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 md:py-24">
         <FadeUp className="max-w-xl">
           <h2 className="text-3xl font-bold tracking-tight text-gray-800 md:text-4xl">
             Whatever the problem, we can fix it.
@@ -32,10 +32,10 @@ export default function Services() {
         </FadeUp>
 
         {/* Card grid — each card lifts slightly on hover */}
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((service, index) => (
             <FadeUp key={service.title} delay={index * 0.08}>
-              <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
+              <m.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
                 <Card className="h-full">
                   <CardContent>
                     <service.icon className="h-8 w-8 text-forest" aria-hidden="true" />
@@ -43,7 +43,7 @@ export default function Services() {
                     <p className="mt-2 text-base text-slate-600">{service.desc}</p>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </m.div>
             </FadeUp>
           ))}
         </div>

@@ -1,133 +1,111 @@
-// Hero.jsx — full-viewport asymmetrical hero: heading block on the LEFT, the
-// "Get Help Now" CTA offset to the RIGHT with a handwritten "AI-Powered" note
-// and curved arrow. The aurora animates behind everything.
+// Hero.jsx — light two-column hero with the AI voice agent as the centerpiece:
+// heading block on the LEFT, a large breathing mic button on the RIGHT. The
+// whole hero enters as one staggered fade/slide sequence on page load.
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Mic } from 'lucide-react';
 import AuroraBackground from './AuroraBackground';
 
-// Hand-drawn curved arrow that sweeps down toward the CTA button
-function CurvedArrow() {
-  return (
-    <svg width="64" height="58" viewBox="0 0 64 58" fill="none" aria-hidden="true">
-      {/* Curved shaft */}
-      <path
-        d="M6 6 C 34 2, 52 18, 55 44"
-        stroke="#14432A"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Arrowhead */}
-      <path
-        d="M47 40 L55 48 L61 38"
-        stroke="#14432A"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
-    </svg>
-  );
-}
+// Resting and bloomed shadows for the voice button's idle "breathing" pulse
+const SHADOW_REST = '0 12px 32px rgba(20, 67, 42, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.18)';
+const SHADOW_BLOOM = '0 18px 48px rgba(20, 67, 42, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.18)';
 
-// Hero section — fills the viewport; two offset columns create deliberate tension
+// Hero section — no forced viewport height; the content earns its own space
 export default function Hero({ onAskAI }) {
+  const reduceMotion = useReducedMotion();
+
+  // Staggered entrance for one element in the load sequence. With reduced
+  // motion preferred, elements render instantly with no offset.
+  const entrance = (delay) =>
+    reduceMotion
+      ? {}
+      : {
+          initial: { opacity: 0, y: 18 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.55, ease: 'easeOut', delay },
+        };
+
+  // Idle breathing: a slow, subtle scale + shadow bloom so the button reads
+  // as alive and waiting. Starts after the entrance sequence settles.
+  const breathe = reduceMotion
+    ? {}
+    : {
+        animate: { scale: [1, 1.03, 1], boxShadow: [SHADOW_REST, SHADOW_BLOOM, SHADOW_REST] },
+        transition: { duration: 3.2, repeat: Infinity, ease: 'easeInOut', delay: 1.2 },
+      };
+
   return (
     <AuroraBackground className="border-b border-slate-200">
-      {/* min-height fills the viewport below the 4rem header; content centers vertically */}
       <section
         id="top"
-        className="mx-auto grid min-h-[calc(100svh-4rem)] w-full max-w-6xl content-center gap-14 px-4 py-16 sm:px-6 lg:grid-cols-[1.2fr_1fr]"
+        className="mx-auto grid w-full max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 md:py-24 lg:grid-cols-[1.15fr_1fr] lg:gap-10"
       >
         {/* LEFT: heading block */}
         <div className="max-w-xl">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+          <m.p
+            {...entrance(0)}
             className="text-sm font-semibold uppercase tracking-[0.18em] text-forest"
           >
             Open now. 24/7 emergency service
-          </motion.p>
+          </m.p>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            className="mt-5 text-5xl font-bold tracking-tight text-gray-800 md:text-7xl"
+          <m.h1
+            {...entrance(0.12)}
+            className="mt-5 text-5xl font-bold tracking-tight text-gray-800 md:text-6xl"
           >
             Boston Plumbing
-          </motion.h1>
+          </m.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mt-5 font-display text-2xl font-semibold text-gray-800 md:text-3xl"
+          <m.p
+            {...entrance(0.24)}
+            className="mt-4 font-display text-2xl font-semibold text-gray-800 md:text-3xl"
           >
             Emergency plumbing, engineered for speed.
-          </motion.p>
+          </m.p>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.45 }}
-            className="mt-5 text-lg text-slate-600"
-          >
+          <m.p {...entrance(0.36)} className="mt-5 text-lg text-slate-600">
             Licensed plumbers on call day and night for burst pipes, leaks, blocked drains
             and water heaters. We are usually at your door within 45 minutes.
-          </motion.p>
-        </div>
+          </m.p>
 
-        {/* RIGHT: CTA block, pushed down for asymmetry */}
-        <div className="flex flex-col items-start gap-0 lg:items-end lg:self-end lg:pb-6">
-          {/* Handwritten AI note beside a curved arrow pointing at the button */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="mr-8 flex items-start gap-2"
-            aria-hidden="true"
-          >
-            <span className="-rotate-6 font-script text-3xl text-forest">AI-Powered</span>
-            <CurvedArrow />
-          </motion.div>
-
-          {/* Premium pill CTA: inner top highlight for depth (flat colours, no gradient),
-              icon set in its own tonal chip so it reads as part of the button */}
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.55 }}
-            whileHover={{
-              scale: 1.05,
-              boxShadow: '0 18px 44px rgba(15, 61, 46, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.28)',
-            }}
-            whileTap={{ scale: 0.97 }}
-            onClick={onAskAI}
-            className="group inline-flex items-center gap-4 rounded-full bg-forest py-4 pl-5 pr-10 text-xl font-bold text-white shadow-[0_10px_28px_rgba(15,61,46,0.28),inset_0_1px_0_rgba(255,255,255,0.18)] transition-colors hover:bg-[#1A5A38]"
-          >
-            <span className="grid h-12 w-12 place-items-center rounded-full bg-white/15 transition-colors group-hover:bg-white/25">
-              <Mic className="h-6 w-6" aria-hidden="true" />
-            </span>
-            Get Help Now
-          </motion.button>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-            className="mt-4 text-base text-slate-600 lg:text-right"
-          >
-            Just talk, no typing needed.
-            <br />
-            Or call{' '}
+          <m.p {...entrance(0.48)} className="mt-5 text-base text-slate-600">
+            Prefer the phone? Call{' '}
             <a href="tel:+15550123456" className="font-semibold text-forest underline">
               (555) 012-3456
-            </a>
-            .
-          </motion.p>
+            </a>{' '}
+            any hour.
+          </m.p>
+        </div>
+
+        {/* RIGHT: the voice agent — the product this site exists to showcase */}
+        <div className="flex flex-col items-center gap-7 lg:py-4">
+          <m.div {...entrance(0.3)} className="relative">
+            {/* Soft green halo so the button owns its space without heavy chrome */}
+            <div
+              className="absolute -inset-8 rounded-full bg-forest/10 blur-2xl"
+              aria-hidden="true"
+            />
+            <m.button
+              {...breathe}
+              whileHover={reduceMotion ? undefined : { scale: 1.05 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={onAskAI}
+              className="relative grid h-40 w-40 place-items-center rounded-full bg-forest text-white shadow-[0_12px_32px_rgba(20,67,42,0.28),inset_0_1px_0_rgba(255,255,255,0.18)] transition-colors hover:bg-[#1A5A38] active:bg-forest-deep sm:h-48 sm:w-48"
+              aria-label="Talk to our AI assistant"
+            >
+              <Mic className="h-14 w-14 sm:h-16 sm:w-16" aria-hidden="true" />
+            </m.button>
+          </m.div>
+
+          <m.div {...entrance(0.42)} className="max-w-xs text-center">
+            <p className="font-display text-xl font-semibold text-gray-800">
+              Talk to us. We&rsquo;re listening.
+            </p>
+            <p className="mt-2 text-base text-slate-600">
+              Our AI assistant answers questions, quotes prices and books visits.
+              Just press and speak — no typing needed.
+            </p>
+          </m.div>
         </div>
       </section>
     </AuroraBackground>
