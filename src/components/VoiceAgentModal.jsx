@@ -43,6 +43,7 @@ export default function VoiceAgentModal({ open, onClose }) {
   const [errorMessage, setErrorMessage] = useState('');
   const recorderRef = useRef(null); // active recorder handle
   const analyserRef = useRef(null); // live mic analyser, read by the orb
+  const audioPlayerRef = useRef(null); // currently playing response audio, if any
 
   // Starts microphone capture and hands the analyser to the orb
   const beginListening = async () => {
@@ -72,7 +73,7 @@ export default function VoiceAgentModal({ open, onClose }) {
 
       // Speak the reply: webhook audio if provided, otherwise browser speech synthesis
       setAssistantState('speaking');
-      if (data.audio) await playAudioResponse(data.audio, data.audioMimeType);
+      if (data.audio) await playAudioResponse(data.audio, 'audio/wav', audioPlayerRef);
       else await speakText(data.answer);
       setAssistantState('idle'); // ready for the next question
     } catch {
@@ -87,14 +88,28 @@ export default function VoiceAgentModal({ open, onClose }) {
     else if (assistantState === 'idle') beginListening();
   };
 
-  // Closes the modal and aborts any recording or speech in progress
+  // Closes the modal and aborts any recording, speech, or audio playback in progress
   const handleClose = () => {
     recorderRef.current?.stop();
     recorderRef.current = null;
     analyserRef.current = null;
     window.speechSynthesis?.cancel();
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current = null;
+    }
     setAssistantState('idle');
     onClose();
+  };
+
+  // Lets the user stop the assistant mid-response, without closing the whole modal
+  const stopSpeaking = () => {
+    window.speechSynthesis?.cancel();
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current = null;
+    }
+    setAssistantState('idle');
   };
 
   const isBusy = assistantState === 'thinking' || assistantState === 'speaking';
@@ -104,7 +119,7 @@ export default function VoiceAgentModal({ open, onClose }) {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 grid place-items-center bg-gray-800/40 p-4"
+          className="fixed inset-0 z-50 overflow-y-auto bg-gray-800/40 p-4 flex items-start justify-center sm:items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -116,7 +131,7 @@ export default function VoiceAgentModal({ open, onClose }) {
             role="dialog"
             aria-modal="true"
             aria-label="Boston Plumbing AI assistant"
-            className="relative w-full max-w-lg rounded-md border border-slate-200 bg-white p-8 shadow-lg"
+            className="relative w-full max-w-lg rounded-md border border-slate-200 bg-white p-8 shadow-lg my-8 max-h-[85vh] overflow-y-auto"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -188,7 +203,7 @@ export default function VoiceAgentModal({ open, onClose }) {
             {/* Circular icon-only talk button, matching the orb's aesthetic.
                 The status line above carries the instructions; the button stays
                 labelled for screen readers via aria-label. */}
-            <div className="mt-7 flex justify-center">
+            <div className="mt-7 flex flex-col items-center">
               <motion.button
                 onClick={handleTalkClick}
                 disabled={isBusy}
@@ -222,6 +237,16 @@ export default function VoiceAgentModal({ open, onClose }) {
                   <Mic className="h-7 w-7" aria-hidden="true" />
                 )}
               </motion.button>
+
+              {/* Lets the user interrupt playback instead of waiting it out */}
+              {assistantState === 'speaking' && (
+                <button
+                  onClick={stopSpeaking}
+                  className="mt-3 text-sm font-medium text-slate-500 underline hover:text-gray-800"
+                >
+                  Stop speaking
+                </button>
+              )}
             </div>
           </motion.div>
         </motion.div>

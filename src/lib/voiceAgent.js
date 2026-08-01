@@ -4,7 +4,7 @@
 // so the 3D orb can react to the caller's voice in real time.
 
 // n8n endpoint that receives the recorded audio and returns the AI answer
-const WEBHOOK_URL = 'http://n8n.wayfore.studio:5678/webhook/plumbing-voice';
+const WEBHOOK_URL = 'https://n8n.wayfore.studio/webhook/plumbing-voice';
 
 // Shared AudioContext for mic analysis (created lazily after a user gesture)
 let audioCtx = null;
@@ -76,12 +76,17 @@ export async function sendToWebhook(audioBlob) {
 
 // Plays a base64-encoded audio response through an <audio> element.
 // Resolves when playback finishes (or fails, so the UI never hangs).
-export function playAudioResponse(base64Audio, mimeType = 'audio/mpeg') {
+export function playAudioResponse(base64Audio, mimeType = 'audio/wav', audioRef) {
   return new Promise((resolve) => {
     const player = new Audio(`data:${mimeType};base64,${base64Audio}`);
-    player.onended = resolve;
-    player.onerror = resolve;
-    player.play().catch(resolve);
+    if (audioRef) audioRef.current = player;
+    const finish = () => {
+      if (audioRef) audioRef.current = null;
+      resolve();
+    };
+    player.onended = finish;
+    player.onerror = finish;
+    player.play().catch(finish);
   });
 }
 
