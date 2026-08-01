@@ -121,24 +121,17 @@ function FlickeringGrid({
     let animationFrame;
     let gridParams;
 
-    const updateCanvasSize = () => {
-      const newWidth = width || container.clientWidth;
-      const newHeight = height || container.clientHeight;
-
-      setCanvasSize({
-        width: newWidth,
-        height: newHeight,
-      });
-
-      gridParams = setupCanvas(canvas, newWidth, newHeight);
-    };
-
-    updateCanvasSize();
-
     let lastTime = 0;
 
     const animate = (time) => {
       if (!isInView) return;
+
+      // The size now arrives asynchronously from the ResizeObserver, which is
+      // delivered after rAF within a frame. Idle until it lands.
+      if (!gridParams) {
+        animationFrame = requestAnimationFrame(animate);
+        return;
+      }
 
       const deltaTime = (time - lastTime) / 1000;
       lastTime = time;
@@ -158,8 +151,21 @@ function FlickeringGrid({
       animationFrame = requestAnimationFrame(animate);
     };
 
-    const resizeObserver = new ResizeObserver(() => {
-      updateCanvasSize();
+    // ResizeObserver fires once immediately on observe() with the size the
+    // browser has already computed, so the initial dimensions come from here
+    // too — no synchronous clientWidth/clientHeight read to force a reflow.
+    const resizeObserver = new ResizeObserver(([entry]) => {
+      const { width: observedWidth, height: observedHeight } = entry.contentRect;
+
+      const newWidth = width || observedWidth;
+      const newHeight = height || observedHeight;
+
+      setCanvasSize({
+        width: newWidth,
+        height: newHeight,
+      });
+
+      gridParams = setupCanvas(canvas, newWidth, newHeight);
     });
 
     resizeObserver.observe(container);
