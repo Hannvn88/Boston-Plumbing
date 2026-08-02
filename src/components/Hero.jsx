@@ -38,7 +38,7 @@ export default function Hero({ onAskAI }) {
     <AuroraBackground className="border-b border-slate-200">
       <section
         id="top"
-        className="mx-auto grid w-full max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 md:py-24 lg:grid-cols-[1.15fr_1fr] lg:gap-10"
+        className="mx-auto grid w-full max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 md:py-24 lg:min-h-[80vh] lg:grid-cols-[1.15fr_1fr] lg:gap-10"
       >
         {/* LEFT: heading block */}
         <div className="max-w-xl">
